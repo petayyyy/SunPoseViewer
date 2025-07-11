@@ -37,6 +37,7 @@ private:
 
     void drawEarth();
     void drawGrid();
+    void drawUser();
     void drawSunPath();
     void drawSun(GLfloat* sunLightPosition);
     void loadTexture();
