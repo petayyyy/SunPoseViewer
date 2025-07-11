@@ -9,6 +9,11 @@ struct SunPosition {
     float altitude;
 };
 
+struct Point3fN
+{
+    float x, y, z;
+};
+
 class SunVisualizer : protected QOpenGLFunctions {
 public:
     SunVisualizer();

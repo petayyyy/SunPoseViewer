@@ -3,12 +3,6 @@
 #include <GL/glu.h>
 #include <cmath>
 
-struct Point3fN
-{
-    float x, y, z;
-};
-
-
 SunVisualizer::SunVisualizer() {}
 
 void SunVisualizer::initGL() {
@@ -48,45 +42,6 @@ void SunVisualizer::setSunriseSunsetTimes(const QString& sunrise, const QString&
     sunriseTime = sunrise;
     sunsetTime = sunset;
 }
-
-// void SunVisualizer::render(float rotationX, float rotationY, float zoom) {
-//     // Очистка буферов
-//     glClearColor(0.2f, 0.2f, 0.3f, 1.0f);  // Более светлый фон
-//     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-//     // Настройка вида
-//     glMatrixMode(GL_MODELVIEW);
-//     glLoadIdentity();
-
-//     // Позиция камеры
-//     glTranslatef(0.0f, 0.0f, -5.0f * zoom);
-//     glRotatef(rotationX, 1.0f, 0.0f, 0.0f);
-//     glRotatef(rotationY, 0.0f, 1.0f, 0.0f);
-
-//     // Позиция и параметры источника света в мировых координатах (не в glLoadIdentity!)
-//     GLfloat light_position[] = { 0.0f, 0.0f, 5.0f, 1.0f };
-//     GLfloat diffuse_light[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-//     GLfloat ambient_light[] = { 0.3f, 0.3f, 0.3f, 1.0f };
-//     GLfloat specular_light[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-
-//     glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-//     glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse_light);
-//     glLightfv(GL_LIGHT0, GL_AMBIENT, ambient_light);
-//     glLightfv(GL_LIGHT0, GL_SPECULAR, specular_light);
-
-//     glEnable(GL_LIGHT0);
-//     glEnable(GL_LIGHTING);
-
-//     // Рисуем землю (будет освещённой)
-//     drawEarth();
-
-//     // Остальные элементы — без освещения
-//     glDisable(GL_LIGHTING);
-
-//     if (showGrid) drawGrid();
-//     drawSunPath();
-//     drawSun();
-// }
 
 void SunVisualizer::render(float rotationX, float rotationY, float zoom) {
     // Очистка буферов
@@ -298,22 +253,6 @@ void SunVisualizer::drawSunPath() {
     }
     glEnd();
 }
-
-// void SunVisualizer::drawSun() {
-//     glPushMatrix();
-//     float theta = currentSunPosition.azimuth * M_PI / 180.0f;
-//     float phi = currentSunPosition.altitude * M_PI / 180.0f;
-//     float r = 1.2f;
-//     float x = r * cos(phi) * sin(theta);
-//     float y = r * sin(phi);
-//     float z = r * cos(phi) * cos(theta);
-//     glTranslatef(x, y, z);
-//     glColor3f(1.0f, 1.0f, 0.0f);
-//     GLUquadric* quad = gluNewQuadric();
-//     gluSphere(quad, 0.05, 16, 16);
-//     gluDeleteQuadric(quad);
-//     glPopMatrix();
-// }
 
 void SunVisualizer::drawSun(GLfloat* sunLightPosition) {
     glPushMatrix();
