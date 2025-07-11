@@ -1,40 +1,63 @@
 #include "MainWindow.h"
-#include "ui_MainWindow.h"
-#include <QMessageBox>
+#include <QDateTime>
+#include <QDebug>
 
-MainWindow::MainWindow(QWidget *parent)
-  : QMainWindow(parent), ui(new Ui::MainWindow)
-{
-    ui->setupUi(this);
-    connect(ui->calculateButton, &QPushButton::clicked, this, &MainWindow::calculateSunPosition);
-    connect(ui->useSystemTimeCheckBox, &QCheckBox::toggled, this, &MainWindow::toggleDateTimeInput);
-    connect(ui->gridCheckBox, &QCheckBox::toggled, ui->sunWidget, &SunWidget::toggleGrid);
-    ui->useSystemTimeCheckBox->setChecked(true);
-    toggleDateTimeInput(true);
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
+    ui.setupUi(this);
+    
+    // Установка текущей даты и времени
+    ui.dateTimeEdit->setDateTime(QDateTime::currentDateTime());
+    
+    // Подключение сигналов к слотам
+    connect(ui.buttonCalculate, &QPushButton::clicked, this, &MainWindow::onCalculateClicked);
+    connect(ui.checkUseSystemTime, &QCheckBox::stateChanged, this, &MainWindow::onUseSystemTimeChanged);
+    connect(ui.checkShowGrid, &QCheckBox::stateChanged, this, &MainWindow::onShowGridChanged);
+    
+    // Инициализация SunWidget
+    ui.openGLWidget->setUserLocation(0, 0);
+    ui.openGLWidget->setShowGrid(true);
 }
 
-MainWindow::~MainWindow() {
-    delete ui;
-}
-
-void MainWindow::toggleDateTimeInput(bool useSystem) {
-    ui->dateTimeEdit->setEnabled(!useSystem);
-}
-
-void MainWindow::calculateSunPosition() {
-    double lat = ui->latitudeSpinBox->value();
-    double lon = ui->longitudeSpinBox->value();
-    double alt = ui->altitudeSpinBox->value();
-    QDateTime dt = ui->useSystemTimeCheckBox->isChecked()
-                   ? QDateTime::currentDateTimeUtc()
-                   : ui->dateTimeEdit->dateTime().toUTC();
-
-    auto coords = calculator.getHorizontalCoordinates(lat, lon, alt, dt);
-    if (!coords.valid) {
-        QMessageBox::warning(this, "Ошибка расчёта", "Неверные параметры или сбой вычислений.");
-        return;
+void MainWindow::onCalculateClicked() {
+    double lat = ui.spinLatitude->value();
+    double lon = ui.spinLongitude->value();
+    int alt = ui.spinAltitude->value();
+    bool useSystemTime = ui.checkUseSystemTime->isChecked();
+    
+    QDateTime datetime;
+    if (useSystemTime) {
+        datetime = QDateTime::currentDateTime();
+    } else {
+        datetime = ui.dateTimeEdit->dateTime();
     }
-    ui->azimuthLabel->setText(QString::number(coords.azimuth, 'f', 2));
-    ui->altitudeLabel->setText(QString::number(coords.altitude, 'f', 2));
-    ui->sunWidget->setCoords(coords.azimuth, coords.altitude);
+    
+    qDebug() << "Calculating for:";
+    qDebug() << "Latitude:" << lat;
+    qDebug() << "Longitude:" << lon;
+    qDebug() << "Altitude:" << alt;
+    qDebug() << "DateTime:" << datetime;
+    
+    // Пример установки данных в виджет
+    std::vector<SunPosition> path = {
+        {30.0f, 10.0f},
+        {60.0f, 45.0f},
+        {90.0f, 60.0f}
+    };
+    
+    SunPosition current = {lat, lon};
+    
+    ui.openGLWidget->setSunPath(path);
+    ui.openGLWidget->setCurrentSunPosition(current);
+    ui.openGLWidget->setSunriseSunsetTimes("06:00", "18:00");
+    ui.openGLWidget->setUserLocation(lat, lon);
+}
+
+void MainWindow::onUseSystemTimeChanged(int state) {
+    bool enabled = (state != Qt::Checked);
+    ui.dateTimeEdit->setEnabled(enabled);
+}
+
+void MainWindow::onShowGridChanged(int state) {
+    bool show = (state == Qt::Checked);
+    ui.openGLWidget->setShowGrid(show);
 }
