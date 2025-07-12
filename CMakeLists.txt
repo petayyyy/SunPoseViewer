@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Указываем Qt6 модули
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets OpenGL Gui OpenGLWidgets)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets OpenGL Gui OpenGLWidgets Positioning)
 
 # Добавляем пути для поиска OpenGL
 find_package(OpenGL REQUIRED)
@@ -106,6 +106,7 @@ target_link_libraries(SunPoseViewer
     Qt6::Gui
     Qt6::OpenGL
     Qt6::OpenGLWidgets
+    Qt6::Positioning
     OpenGL::GL
     OpenGL::GLU
 )
