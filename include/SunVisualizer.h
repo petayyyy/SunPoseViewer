@@ -9,6 +9,11 @@ struct SunPosition {
     float altitude;
 };
 
+struct Point3f
+{
+    float x, y, z;
+};
+
 class SunVisualizer : protected QOpenGLFunctions {
 public:
     SunVisualizer();
@@ -22,6 +27,9 @@ public:
     void setSunPath(const std::vector<SunPosition>& path);
     void setCurrentSunPosition(const SunPosition& position);
     void setSunriseSunsetTimes(const QString& sunrise, const QString& sunset);
+
+    const std::vector<SunPosition>& getSunPath() const { return sunPath; }
+    const SunPosition& getCurrentSunPosition() const { return currentSunPosition; }
 
 private:
     double latitude = 0.0;

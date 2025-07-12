@@ -33,8 +33,8 @@ void SunWidget::mousePressEvent(QMouseEvent* event) {
 void SunWidget::mouseMoveEvent(QMouseEvent* event) {
     float dx = event->x() - lastMousePos.x();
     float dy = event->y() - lastMousePos.y();
-    rotationX -= dy * 0.5f;
-    rotationY -= dx * 0.5f;
+    rotationX -= dy * 0.25f;
+    rotationY -= dx * 0.25f;
     lastMousePos = event->pos();
     update();
 }

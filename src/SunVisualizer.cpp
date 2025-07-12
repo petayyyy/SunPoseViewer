@@ -3,12 +3,6 @@
 #include <GL/glu.h>
 #include <cmath>
 
-struct Point3fN
-{
-    float x, y, z;
-};
-
-
 SunVisualizer::SunVisualizer() {}
 
 void SunVisualizer::initGL() {
@@ -49,45 +43,6 @@ void SunVisualizer::setSunriseSunsetTimes(const QString& sunrise, const QString&
     sunsetTime = sunset;
 }
 
-// void SunVisualizer::render(float rotationX, float rotationY, float zoom) {
-//     // Очистка буферов
-//     glClearColor(0.2f, 0.2f, 0.3f, 1.0f);  // Более светлый фон
-//     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-//     // Настройка вида
-//     glMatrixMode(GL_MODELVIEW);
-//     glLoadIdentity();
-
-//     // Позиция камеры
-//     glTranslatef(0.0f, 0.0f, -5.0f * zoom);
-//     glRotatef(rotationX, 1.0f, 0.0f, 0.0f);
-//     glRotatef(rotationY, 0.0f, 1.0f, 0.0f);
-
-//     // Позиция и параметры источника света в мировых координатах (не в glLoadIdentity!)
-//     GLfloat light_position[] = { 0.0f, 0.0f, 5.0f, 1.0f };
-//     GLfloat diffuse_light[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-//     GLfloat ambient_light[] = { 0.3f, 0.3f, 0.3f, 1.0f };
-//     GLfloat specular_light[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-
-//     glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-//     glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse_light);
-//     glLightfv(GL_LIGHT0, GL_AMBIENT, ambient_light);
-//     glLightfv(GL_LIGHT0, GL_SPECULAR, specular_light);
-
-//     glEnable(GL_LIGHT0);
-//     glEnable(GL_LIGHTING);
-
-//     // Рисуем землю (будет освещённой)
-//     drawEarth();
-
-//     // Остальные элементы — без освещения
-//     glDisable(GL_LIGHTING);
-
-//     if (showGrid) drawGrid();
-//     drawSunPath();
-//     drawSun();
-// }
-
 void SunVisualizer::render(float rotationX, float rotationY, float zoom) {
     // Очистка буферов
     glClearColor(0.2f, 0.2f, 0.3f, 1.0f);
@@ -98,23 +53,32 @@ void SunVisualizer::render(float rotationX, float rotationY, float zoom) {
     glLoadIdentity();
 
     // Камера
-    glTranslatef(0.0f, 0.0f, -5.0f * zoom);
+    glTranslatef(0.0f, 0.0f, -40.0f * zoom);
     glRotatef(rotationX, 1.0f, 0.0f, 0.0f);
     glRotatef(rotationY, 0.0f, 1.0f, 0.0f);
 
-    // Рисуем Солнце (визуально и как источник света)
+    // Рисуем Солнце
     GLfloat sunPos[4];
-    drawSun(sunPos);  // передаём массив для света
+    drawSun(sunPos);
 
-    // Включаем освещение от Солнца
-    GLfloat diffuse_light[] = { 1.0f, 1.0f, 0.9f, 1.0f };    // тёплый свет
-    GLfloat ambient_light[] = { 0.2f, 0.2f, 0.2f, 1.0f };    // мягкий фон
-    GLfloat specular_light[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    // Преобразуем позицию в направление (w=0)
+    GLfloat lightDir[4] = { sunPos[0], sunPos[1], sunPos[2], 0.0f };
 
-    glLightfv(GL_LIGHT0, GL_POSITION, sunPos);
+    // Усиленные параметры света
+    GLfloat diffuse_light[] = { 1.5f, 1.5f, 1.35f, 1.0f };
+    GLfloat ambient_light[] = { 0.3f, 0.3f, 0.3f, 1.0f };
+    GLfloat specular_light[] = { 1.5f, 1.5f, 1.5f, 1.0f };
+
+    // Настраиваем источник
+    glLightfv(GL_LIGHT0, GL_POSITION, lightDir);  // Направленный свет
     glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse_light);
     glLightfv(GL_LIGHT0, GL_AMBIENT, ambient_light);
     glLightfv(GL_LIGHT0, GL_SPECULAR, specular_light);
+
+    // Отключаем затухание (для направленного источника не требуется, но для точечного полезно)
+    glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 1.0f);
+    glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.0f);
+    glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.0f);
 
     glEnable(GL_LIGHT0);
     glEnable(GL_LIGHTING);
@@ -189,7 +153,7 @@ void SunVisualizer::drawEarth() {
     GLUquadric* quad = gluNewQuadric();
     gluQuadricTexture(quad, GL_TRUE);
     gluQuadricNormals(quad, GLU_SMOOTH);
-    gluSphere(quad, 1.0, 64, 64);
+    gluSphere(quad, 10.0, 64, 64);
     gluDeleteQuadric(quad);
     
     glDisable(GL_TEXTURE_2D);
@@ -198,10 +162,10 @@ void SunVisualizer::drawEarth() {
 }
 
 // Общая функция преобразования координат
-Point3fN sphericalToCartesian(float lon, float lat, float radius = 1.0f) {
+Point3f sphericalToCartesian(float lon, float lat, float radius = 10.0f) {
     float theta = (lon - 90) * M_PI / 180.0f;
     float phi = lat * M_PI / 180.0f;
-    Point3fN arrOut;
+    Point3f arrOut;
     arrOut.x = radius * cos(phi) * cos(theta);
     arrOut.y = radius * cos(phi) * sin(theta);
     arrOut.z = radius * sin(phi);
@@ -209,13 +173,33 @@ Point3fN sphericalToCartesian(float lon, float lat, float radius = 1.0f) {
 }
 
 void SunVisualizer::drawGrid() {
+    // glColor3f(0.7f, 0.7f, 0.7f);
+    // glBegin(GL_LINES);
+    // for (float lat = -80; lat <= 80; lat += 10.0f) {
+    //     for (float lon = -180; lon <= 180; lon += 10.0f) {
+    //         Point3f p = sphericalToCartesian(lon, lat);
+    //         glVertex3f(p.x, p.y, p.z);
+    //         glVertex3f(p.x * 1.01f, p.y * 1.01f, p.z * 1.01f);
+    //     }
+    // }
+    // glEnd();
+
     glColor3f(0.7f, 0.7f, 0.7f);
-    glBegin(GL_LINES);
-    for (float lat = -80; lat <= 80; lat += 10.0f) {
+    glBegin(GL_LINE_STRIP);
+    for (float lat = -90; lat <= 90; lat += 10.0f) {
         for (float lon = -180; lon <= 180; lon += 10.0f) {
-            Point3fN p = sphericalToCartesian(lon, lat);
+            Point3f p = sphericalToCartesian(lon, lat, 10.05f);
             glVertex3f(p.x, p.y, p.z);
-            glVertex3f(p.x * 1.01f, p.y * 1.01f, p.z * 1.01f);
+        }
+    }
+    glEnd();
+
+    glColor3f(0.7f, 0.7f, 0.7f);
+    glBegin(GL_LINE_STRIP);
+    for (float lon = -180; lon <= 180; lon += 10.0f) {
+        for (float lat = -90; lat <= 90; lat += 10.0f) {
+            Point3f p = sphericalToCartesian(lon, lat, 10.05f);
+            glVertex3f(p.x, p.y, p.z);
         }
     }
     glEnd();
@@ -224,20 +208,53 @@ void SunVisualizer::drawGrid() {
 void SunVisualizer::drawUser() {
     glPushMatrix();
     
-    // Преобразуем координаты пользователя (широта, долгота) в декартовы
-    Point3fN userPos = sphericalToCartesian(currentSunPosition.altitude, currentSunPosition.azimuth, 1.01f);
+    // Преобразуем координаты пользователя в декартовы
+    Point3f userPos = sphericalToCartesian(currentSunPosition.altitude, currentSunPosition.azimuth, 10.01f);
     
     // Перемещаемся к позиции пользователя
     glTranslatef(userPos.x, userPos.y, userPos.z);
     
-    // // Ориентируем куб по нормали к поверхности
-    // glRotatef(-latitude, 0.0f, 0.0f, 1.0f);
-    // glRotatef(longitude, 0.0f, 1.0f, 0.0f);
+    // Вычисляем нормаль к сфере (единичный вектор от центра к точке)
+    Point3f normal = userPos;
+    float length = sqrt(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
+    if (length > 0) {
+        normal.x /= length;
+        normal.y /= length;
+        normal.z /= length;
+    }
     
-    // Размер куба
-    float sizeW = 0.01f;
-    float sizeH = 0.05f;
-    float sizeZ = 0.01f;
+    // Выравниваем ось Y куба по нормали
+    Point3f up;
+    up.x = 0.0f;
+    up.y = 1.0f;
+    up.z = 0.0f; // Исходное направление куба
+    float dot = up.x * normal.x + up.y * normal.y + up.z * normal.z;
+    
+    if (fabs(dot + 1.0f) < 0.000001f) {
+        // Противоположные направления: разворот на 180°
+        glRotatef(180.0f, 1.0f, 0.0f, 0.0f);
+    } else if (fabs(dot - 1.0f) > 0.000001f) {
+        // Вычисляем ось и угол вращения
+        Point3f axis;
+        axis.x = up.y * normal.z - up.z * normal.y;
+        axis.y = up.z * normal.x - up.x * normal.z;
+        axis.z = up.x * normal.y - up.y * normal.x;
+        
+        float axisLength = sqrt(axis.x * axis.x + axis.y * axis.y + axis.z * axis.z);
+        if (axisLength > 0) {
+            axis.x /= axisLength;
+            axis.y /= axisLength;
+            axis.z /= axisLength;
+            
+            float angle = acosf(dot) * 180.0f / M_PI;
+            glRotatef(angle, axis.x, axis.y, axis.z);
+        }
+    }
+    
+    // Размер куба (ось Y теперь перпендикулярна сфере)
+    float sizeW = 0.1f;
+    float sizeH = 0.5f;
+    float sizeZ = 0.1f;
 
     float w = sizeW / 2;
     float h = sizeH / 2;
@@ -281,9 +298,9 @@ void SunVisualizer::drawUser() {
         
         // Левая грань
         glVertex3f(-w, -h, -d);
-        glVertex3f(-w, -h, d);
-        glVertex3f(-w, h, d);
         glVertex3f(-w, h, -d);
+        glVertex3f(-w, h, d);
+        glVertex3f(-w, -h, d);
     glEnd();
     
     glPopMatrix();
@@ -293,31 +310,15 @@ void SunVisualizer::drawSunPath() {
     glColor3f(1.0f, 0.8f, 0.0f);
     glBegin(GL_LINE_STRIP);
     for (const auto& pos : sunPath) {
-        Point3fN  p = sphericalToCartesian(pos.azimuth, pos.altitude, 1.2f);
+        Point3f  p = sphericalToCartesian(pos.azimuth, pos.altitude, 12.0f);
         glVertex3f(p.x, p.y, p.z);
     }
     glEnd();
 }
 
-// void SunVisualizer::drawSun() {
-//     glPushMatrix();
-//     float theta = currentSunPosition.azimuth * M_PI / 180.0f;
-//     float phi = currentSunPosition.altitude * M_PI / 180.0f;
-//     float r = 1.2f;
-//     float x = r * cos(phi) * sin(theta);
-//     float y = r * sin(phi);
-//     float z = r * cos(phi) * cos(theta);
-//     glTranslatef(x, y, z);
-//     glColor3f(1.0f, 1.0f, 0.0f);
-//     GLUquadric* quad = gluNewQuadric();
-//     gluSphere(quad, 0.05, 16, 16);
-//     gluDeleteQuadric(quad);
-//     glPopMatrix();
-// }
-
 void SunVisualizer::drawSun(GLfloat* sunLightPosition) {
     glPushMatrix();
-    Point3fN  p = sphericalToCartesian(currentSunPosition.altitude, currentSunPosition.azimuth, 1.2f);
+    Point3f  p = sphericalToCartesian(currentSunPosition.altitude, currentSunPosition.azimuth, 12.0f);
 
     // Возвращаем позицию солнца для света
     if (sunLightPosition) {
@@ -332,7 +333,7 @@ void SunVisualizer::drawSun(GLfloat* sunLightPosition) {
     glColor3f(1.0f, 1.0f, 0.0f);
 
     GLUquadric* quad = gluNewQuadric();
-    gluSphere(quad, 0.05, 16, 16);
+    gluSphere(quad, 0.25, 16, 16);
     gluDeleteQuadric(quad);
 
     glPopMatrix();

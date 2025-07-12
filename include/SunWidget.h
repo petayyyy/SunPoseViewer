@@ -8,7 +8,8 @@ class SunWidget : public QOpenGLWidget {
     Q_OBJECT
 public:
     explicit SunWidget(QWidget* parent = nullptr);
-
+    const SunVisualizer& getVisualizer() const { return visualizer; }
+    
     void setSunPath(const std::vector<SunPosition>& path);
     void setCurrentSunPosition(const SunPosition& position);
     void setSunriseSunsetTimes(const QString& sunrise, const QString& sunset);

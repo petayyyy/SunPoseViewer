@@ -2,6 +2,7 @@
 
 #include <QMainWindow>
 #include "ui_MainWindow.h"
+#include "ResultsWindow.h"
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -16,4 +17,5 @@ private slots:
 
 private:
     Ui::MainWindow ui;
+    ResultsWindow resultsWindow;
 };
