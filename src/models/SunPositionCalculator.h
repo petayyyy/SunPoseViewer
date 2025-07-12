@@ -2,12 +2,12 @@
 #define SUNPOSITIONCALCULATOR_H
 
 #include <cmath>
-#include "libs/APC_VecMat3D.h"
-#include "libs/APC_Math.h"
-#include "libs/APC_PrecNut.h"
-#include "libs/APC_Sun.h"
-#include "libs/APC_Time.h"
-#include "libs/APC_Spheric.h"
+#include "APC_VecMat3D.h"
+#include "APC_Math.h"
+#include "APC_PrecNut.h"
+#include "APC_Sun.h"
+#include "APC_Time.h"
+#include "APC_Spheric.h"
 
 class SunPositionCalculator {
 public:

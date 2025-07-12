@@ -131,7 +131,7 @@ Vec3D::Vec3D (const Polar& polar)
 //
 // Component access (index may be "x", "y", or "z")
 //
-double Vec3D::operator [] (index Index) const
+double Vec3D::operator [] (indexx Index) const
 {
   return m_Vec[Index];
 }
@@ -335,7 +335,7 @@ Mat3D::Mat3D (const Vec3D& e_1, const Vec3D& e_2, const Vec3D& e_3 )
 //
 // Component access: retrieve given column of Matrix Mat
 //
-Vec3D Col(const Mat3D& Mat, index Index)
+Vec3D Col(const Mat3D& Mat, indexx Index)
 {
   Vec3D Res;
 
@@ -350,7 +350,7 @@ Vec3D Col(const Mat3D& Mat, index Index)
 //
 // Component access: retrieve given row of Matrix Mat
 //
-Vec3D Row(const Mat3D& Mat, index Index)
+Vec3D Row(const Mat3D& Mat, indexx Index)
 {
   Vec3D Res;
 

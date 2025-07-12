@@ -28,7 +28,7 @@
 //
 
 // identification for components of Vec3D objects
-enum index {
+enum indexx {
   x = 0,
   y = 1,
   z = 2
@@ -74,14 +74,14 @@ class Vec3D
     Vec3D (const Polar& polar);
 
     // component access (read only)
-    double operator [] (index Index) const;
+    double operator [] (indexx Index) const;
 
     // retrieves polar angles or norm of vector
     double operator [] (pol_index Index);
 
     // component access
-    friend Vec3D Col(const Mat3D& Mat, index Index);
-    friend Vec3D Row(const Mat3D& Mat, index Index);
+    friend Vec3D Col(const Mat3D& Mat, indexx Index);
+    friend Vec3D Row(const Mat3D& Mat, indexx Index);
 
     // in-place addition of another vector
     void operator += (const Vec3D& Vec);
@@ -152,8 +152,8 @@ class Mat3D
     Mat3D ( const Vec3D& e_1, const Vec3D& e_2, const Vec3D& e_3 );
 
     // component access
-    friend Vec3D Col(const Mat3D& Mat, index Index);
-    friend Vec3D Row(const Mat3D& Mat, index Index);
+    friend Vec3D Col(const Mat3D& Mat, indexx Index);
+    friend Vec3D Row(const Mat3D& Mat, indexx Index);
 
     // identity matrix
     friend Mat3D Id3D();

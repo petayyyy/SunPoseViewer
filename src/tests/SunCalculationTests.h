@@ -4,7 +4,7 @@
 #include <vector>
 #include <cmath>
 #include <iostream>
-#include "models/SunPositionCalculator.h"
+#include "SunPositionCalculator.h"
 
 struct TestCase {
     int year;

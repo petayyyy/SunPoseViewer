@@ -209,7 +209,7 @@ void SunVisualizer::drawUser() {
     glPushMatrix();
     
     // Преобразуем координаты пользователя в декартовы
-    Point3f userPos = sphericalToCartesian(currentSunPosition.altitude, currentSunPosition.azimuth, 10.01f);
+    Point3f userPos = sphericalToCartesian(latitude, longitude, 10.01f);
     
     // Перемещаемся к позиции пользователя
     glTranslatef(userPos.x, userPos.y, userPos.z);

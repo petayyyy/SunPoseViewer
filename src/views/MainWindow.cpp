@@ -2,6 +2,7 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QTime>
+#include "SunPositionCalculator.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     ui.setupUi(this);
@@ -25,8 +26,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 }
 
 void MainWindow::onCalculateClicked() {
-    double lat = ui.spinLatitude->value();
-    double lon = ui.spinLongitude->value();
+    double lon = ui.spinLatitude->value();
+    double lat = ui.spinLongitude->value();
     bool useSystemTime = ui.checkUseSystemTime->isChecked();
     
     QDateTime datetime;
@@ -36,6 +37,26 @@ void MainWindow::onCalculateClicked() {
         datetime = ui.dateTimeEdit->dateTime();
     }
     
+    SunPositionCalculator calculator;
+
+    // Настройка наблюдателя
+    SunPositionCalculator::ObserverData obs = {
+        .latitude_deg = lat,
+        .longitude_deg = lon
+    };
+    calculator.setObserver(obs);
+
+    QTime time = datetime.time();
+    QDate date = datetime.date();
+    // Расчет
+    calculator.calculate(date.year(), date.month(), date.day(), time.hour());
+    auto result = calculator.getResult();
+
+    // Вывод результата
+    std::cout << "  Calculated Azimuth: " << result.azimuth_deg << " deg\n"
+              << "  Time: " << date.year() << " y " << date.month() << " m " << date.day() << " d " << time.hour() << "h\n"
+              << "  Calculated Altitude: " << result.altitude_deg << " deg\n";
+
     // Формирование фиктивных данных для демонстрации
     std::vector<SunPosition> path = {
         {30.0f, 10.0f},
@@ -43,7 +64,7 @@ void MainWindow::onCalculateClicked() {
         {90.0f, 60.0f}
     };
     
-    SunPosition current = {static_cast<float>(lat), static_cast<float>(lon)};
+    SunPosition current = {static_cast<float>(result.azimuth_deg), static_cast<float>(result.altitude_deg)};
     
     // Формирование данных для таблицы
     std::vector<std::tuple<QTime, double, double>> positions;
@@ -63,8 +84,8 @@ void MainWindow::onCalculateClicked() {
         current.azimuth, 
         current.altitude,
         positions,
-        lat, 
         lon, 
+        lat, 
         datetime
     );
     
@@ -74,6 +95,7 @@ void MainWindow::onCalculateClicked() {
     // Обновление 3D визуализации
     ui.openGLWidget->setSunPath(path);
     ui.openGLWidget->setCurrentSunPosition(current);
+    ui.openGLWidget->setUserLocation(lat, lon);
     ui.openGLWidget->setSunriseSunsetTimes("06:00", "18:00");
     ui.openGLWidget->setUserLocation(lat, lon);
 }
