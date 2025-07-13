@@ -2,8 +2,36 @@
 #include "stb_image.h"
 #include <GL/glu.h>
 #include <cmath>
+#include <utility>
+#include <tuple>
+#include "iostream"
 
 SunVisualizer::SunVisualizer() {}
+
+// Функция вычисляет координаты точки, соответствующие направлению солнца.
+// Вход: lat, lon – широта и долгота наблюдателя (в градусах),
+//        alt – высота солнца над горизонтом (в градусах),
+//        az  – азимут (в градусах, 0 – север, растет на восток),
+//        scale – масштаб (условное максимальное расстояние при alt=0).
+// Выход: pair<lat, lon> – координаты точки (в градусах).
+std::pair<double,double> computeSunPosition(double lat, double lon, double alt, double az, double scale = 1000000) {
+    // Переводим углы в радианы
+    double latRad = lat * M_PI / 180.0;
+    double azRad  = az  * M_PI / 180.0;
+    double altRad = alt * M_PI / 180.0;
+    // Расчет условного расстояния r (например, обратно пропорционально высоте)
+    double r = scale * std::cos(altRad);  // r=0 при alt=90°, r=scale при alt=0°
+    // Смещение по северному (N) и восточному (E) направлениям (в тех же условных единицах)
+    double N = r * std::cos(azRad);
+    double E = r * std::sin(azRad);
+    // Переводим смещения в градусы (1° широты ≈111111 м)
+    double dLat = N / 111111.0;
+    double dLon = E / (111111.0 * std::cos(latRad));
+    // Новые координаты
+    double newLat = lat + dLat;
+    double newLon = lon + dLon;
+    return std::make_pair(newLat, newLon);
+}
 
 void SunVisualizer::initGL() {
     initializeOpenGLFunctions();
@@ -173,17 +201,6 @@ Point3f sphericalToCartesian(float lon, float lat, float radius = 10.0f) {
 }
 
 void SunVisualizer::drawGrid() {
-    // glColor3f(0.7f, 0.7f, 0.7f);
-    // glBegin(GL_LINES);
-    // for (float lat = -80; lat <= 80; lat += 10.0f) {
-    //     for (float lon = -180; lon <= 180; lon += 10.0f) {
-    //         Point3f p = sphericalToCartesian(lon, lat);
-    //         glVertex3f(p.x, p.y, p.z);
-    //         glVertex3f(p.x * 1.01f, p.y * 1.01f, p.z * 1.01f);
-    //     }
-    // }
-    // glEnd();
-
     glColor3f(0.7f, 0.7f, 0.7f);
     glBegin(GL_LINE_STRIP);
     for (float lat = -90; lat <= 90; lat += 10.0f) {
@@ -209,7 +226,7 @@ void SunVisualizer::drawUser() {
     glPushMatrix();
     
     // Преобразуем координаты пользователя в декартовы
-    Point3f userPos = sphericalToCartesian(latitude, longitude, 10.01f);
+    Point3f userPos = sphericalToCartesian(longitude, latitude, 10.01f);
     
     // Перемещаемся к позиции пользователя
     glTranslatef(userPos.x, userPos.y, userPos.z);
@@ -307,18 +324,22 @@ void SunVisualizer::drawUser() {
 }
 
 void SunVisualizer::drawSunPath() {
-    glColor3f(1.0f, 0.8f, 0.0f);
+    glLineWidth(5.0f);
+    glColor3f(1.0f, 0.5f, 0.0f);
     glBegin(GL_LINE_STRIP);
     for (const auto& pos : sunPath) {
-        Point3f  p = sphericalToCartesian(pos.azimuth, pos.altitude, 12.0f);
+        auto [sunX, sunY] = computeSunPosition(latitude, longitude, pos.altitude, pos.azimuth);
+        Point3f  p = sphericalToCartesian(sunY, sunX, 12.0f);
         glVertex3f(p.x, p.y, p.z);
     }
     glEnd();
+    glLineWidth(1.0f);
 }
 
 void SunVisualizer::drawSun(GLfloat* sunLightPosition) {
     glPushMatrix();
-    Point3f  p = sphericalToCartesian(currentSunPosition.altitude, currentSunPosition.azimuth, 12.0f);
+    auto [sunX, sunY] = computeSunPosition(latitude, longitude, currentSunPosition.altitude, currentSunPosition.azimuth);
+    Point3f  p = sphericalToCartesian(sunY, sunX, 12.0f);
 
     // Возвращаем позицию солнца для света
     if (sunLightPosition) {
