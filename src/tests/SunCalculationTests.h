@@ -6,7 +6,8 @@
 #include <iostream>
 #include "SunPositionCalculator.h"
 
-struct TestCase {
+struct TestCase
+{
     int year;
     int month;
     int day;
@@ -17,14 +18,16 @@ struct TestCase {
     double expected_altitude_deg;
 };
 
-class SunCalculationTests {
+class SunCalculationTests
+{
 public:
     void runTests();
 
 private:
-    void runTest(const TestCase& test);
+    void runTest(const TestCase &test);
 
-    bool isClose(double a, double b, double tolerance = 1e-3) {
+    bool isClose(double a, double b, double tolerance = 1e-3)
+    {
         return std::abs(a - b) <= tolerance;
     }
 };
