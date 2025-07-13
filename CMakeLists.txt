@@ -8,9 +8,13 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Указываем Qt6 модули
-# find_package(Qt6 REQUIRED COMPONENTS Core Widgets OpenGL Gui OpenGLWidgets Positioning)
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets OpenGL Gui OpenGLWidgets)
+# Явно указываем использовать Qt5
+set(QT_VERSION_MAJOR 5)  # Форсируем использование Qt5
+
+# Указываем Qt5 модули
+# find_package(Qt5 REQUIRED COMPONENTS Core Widgets OpenGL Gui OpenGLWidgets Positioning)
+# find_package(Qt5 REQUIRED COMPONENTS Core Widgets OpenGL Gui OpenGLWidgets)
+find_package(Qt5 REQUIRED COMPONENTS Core Widgets OpenGL Gui)
 
 # Добавляем пути для поиска OpenGL
 find_package(OpenGL REQUIRED)
@@ -46,7 +50,7 @@ set(SOURCES
     ${LIB_DIR}/APC_Spheric.cpp
     ${LIB_DIR}/APC_Sun.cpp
     ${LIB_DIR}/APC_Time.cpp
-    ${LIB_DIR}/MockPositioner.cpp
+    # ${LIB_DIR}/MockPositioner.cpp
 )
 
 # Заголовки
@@ -74,7 +78,7 @@ set(HEADERS
     ${LIB_DIR}/APC_Sun.h
     ${LIB_DIR}/APC_Time.h
     ${LIB_DIR}/GNU_iomanip.h
-    ${LIB_DIR}/Positioner.h
+    # ${LIB_DIR}/Positioner.h
 )
 
 # UI файлы
@@ -83,7 +87,7 @@ set(UI_FILES
 )
 
 # Генерация UI
-qt6_wrap_ui(UI_HEADERS ${UI_FILES})
+Qt5_wrap_ui(UI_HEADERS ${UI_FILES})
 
 # Создание исполняемого файла
 add_executable(SunPoseViewer
@@ -104,12 +108,12 @@ target_include_directories(SunPoseViewer PRIVATE
 
 # Линковка библиотек
 target_link_libraries(SunPoseViewer
-    Qt6::Core
-    Qt6::Widgets
-    Qt6::Gui
-    Qt6::OpenGL
-    Qt6::OpenGLWidgets
-    # Qt6::Positioning
+    Qt5::Core
+    Qt5::Widgets
+    Qt5::Gui
+    Qt5::OpenGL
+    # Qt5::OpenGLWidgets
+    # Qt5::Positioning
     OpenGL::GL
     OpenGL::GLU
 )

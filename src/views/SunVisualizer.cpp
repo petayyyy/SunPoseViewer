@@ -5,6 +5,7 @@
 #include <utility>
 #include <tuple>
 #include "iostream"
+#include <QDebug>
 
 SunVisualizer::SunVisualizer() {}
 

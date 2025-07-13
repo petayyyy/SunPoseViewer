@@ -3,7 +3,7 @@
 #include <QMainWindow>
 #include "ui_MainWindow.h"
 #include "ResultsWindow.h"
-#include "Positioner.h"
+// #include "Positioner.h"
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -20,6 +20,6 @@ private slots:
 private:
     Ui::MainWindow ui;
     ResultsWindow resultsWindow;
-    Positioner positioner;
+    // Positioner positioner;
     bool gpsErrorFlag = false;
 };

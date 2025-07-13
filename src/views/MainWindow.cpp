@@ -100,28 +100,28 @@ void MainWindow::onUseSystemLocationChanged(bool checked) {
     ui.spinLatitude->setEnabled(!checked);
     ui.spinLongitude->setEnabled(!checked);
 
-    if (checked) {
-        // Use Positioner to get system coordinates
-        if (positioner.hasValidCoordinates()) {
-            gpsErrorFlag = false;
-            QGeoCoordinate coord = positioner.getCoordinates();
-            ui.spinLatitude->setValue(coord.latitude());
-            ui.spinLongitude->setValue(coord.longitude());
-        } else {
-            //no valid coords => we possibly need an update
-            if (!positioner.updateCoordinates()) {
-                qWarning() << "Failed to start position update";
-                gpsErrorFlag = true;
-            }
-            //and we need to re-enable manual input
-            ui.checkUseSystemLocation ->setEnabled(false);
-        }
-    }
-    else {
-        if(gpsErrorFlag) {
-            QMessageBox::warning(this, "Ошибка позиционирования", " Автоматическое позиционирование недоступно.\n Пожалуйста, введите координаты вручную или повторите позже.");
-        }
-    }
+    // if (checked) {
+    //     // Use Positioner to get system coordinates
+    //     if (positioner.hasValidCoordinates()) {
+    //         gpsErrorFlag = false;
+    //         QGeoCoordinate coord = positioner.getCoordinates();
+    //         ui.spinLatitude->setValue(coord.latitude());
+    //         ui.spinLongitude->setValue(coord.longitude());
+    //     } else {
+    //         //no valid coords => we possibly need an update
+    //         if (!positioner.updateCoordinates()) {
+    //             qWarning() << "Failed to start position update";
+    //             gpsErrorFlag = true;
+    //         }
+    //         //and we need to re-enable manual input
+    //         ui.checkUseSystemLocation ->setEnabled(false);
+    //     }
+    // }
+    // else {
+    //     if(gpsErrorFlag) {
+    //         QMessageBox::warning(this, "Ошибка позиционирования", " Автоматическое позиционирование недоступно.\n Пожалуйста, введите координаты вручную или повторите позже.");
+    //     }
+    // }
 }
 
 void MainWindow::onCalculateClicked() {
