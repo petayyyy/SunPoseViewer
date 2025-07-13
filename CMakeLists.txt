@@ -9,7 +9,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Указываем Qt6 модули
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets OpenGL Gui OpenGLWidgets Positioning)
+# find_package(Qt6 REQUIRED COMPONENTS Core Widgets OpenGL Gui OpenGLWidgets Positioning)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets OpenGL Gui OpenGLWidgets)
 
 # Добавляем пути для поиска OpenGL
 find_package(OpenGL REQUIRED)
@@ -45,7 +46,7 @@ set(SOURCES
     ${LIB_DIR}/APC_Spheric.cpp
     ${LIB_DIR}/APC_Sun.cpp
     ${LIB_DIR}/APC_Time.cpp
-    ${LIB_DIR}/MockPositioner.cpp
+    # ${LIB_DIR}/MockPositioner.cpp
 )
 
 # Заголовки
@@ -73,7 +74,7 @@ set(HEADERS
     ${LIB_DIR}/APC_Sun.h
     ${LIB_DIR}/APC_Time.h
     ${LIB_DIR}/GNU_iomanip.h
-    ${LIB_DIR}/Positioner.h
+    # ${LIB_DIR}/Positioner.h
 )
 
 # UI файлы
@@ -108,7 +109,7 @@ target_link_libraries(SunPoseViewer
     Qt6::Gui
     Qt6::OpenGL
     Qt6::OpenGLWidgets
-    Qt6::Positioning
+    # Qt6::Positioning
     OpenGL::GL
     OpenGL::GLU
 )
