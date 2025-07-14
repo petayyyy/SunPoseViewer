@@ -8,6 +8,7 @@
 #include <sstream>
 #include <iomanip>
 #include <string>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     ui.setupUi(this);
@@ -102,21 +103,22 @@ void MainWindow::onUseSystemLocationChanged(bool checked) {
 
     if (checked) {
         // Use Positioner to get system coordinates
-        if (positioner.hasValidCoordinates()) {
+        /*if (positioner.hasValidCoordinates()) {
             gpsErrorFlag = false;
             QGeoCoordinate coord = positioner.getCoordinates();
             ui.spinLatitude->setValue(coord.latitude());
             ui.spinLongitude->setValue(coord.longitude());
-        } else {
+        } else {*/
             //no valid coords => we possibly need an update
-            if (!positioner.updateCoordinates()) {
+            //if (!positioner.updateCoordinates()) {
                 qWarning() << "Failed to start position update";
                 gpsErrorFlag = true;
-            }
+            //}
             //and we need to re-enable manual input
-            ui.checkUseSystemLocation ->setEnabled(false);
+            //ui.checkUseSystemLocation ->setEnabled(false);
+            ui.checkUseSystemLocation -> setChecked(false);
         }
-    }
+    //}
     else {
         if(gpsErrorFlag) {
             QMessageBox::warning(this, "Ошибка позиционирования", " Автоматическое позиционирование недоступно.\n Пожалуйста, введите координаты вручную или повторите позже.");

@@ -46,7 +46,7 @@ set(SOURCES
     ${LIB_DIR}/APC_Spheric.cpp
     ${LIB_DIR}/APC_Sun.cpp
     ${LIB_DIR}/APC_Time.cpp
-    ${LIB_DIR}/MockPositioner.cpp
+    #${LIB_DIR}/MockPositioner.cpp
 )
 
 # Заголовки
@@ -74,7 +74,7 @@ set(HEADERS
     ${LIB_DIR}/APC_Sun.h
     ${LIB_DIR}/APC_Time.h
     ${LIB_DIR}/GNU_iomanip.h
-    ${LIB_DIR}/Positioner.h
+    #${LIB_DIR}/Positioner.h
 )
 
 # UI файлы
