@@ -1,4 +1,5 @@
 #include "MainWindow.h"
+#include <QMessageBox>
 #include <QDateTime>
 #include <QDebug>
 #include <QTime>
